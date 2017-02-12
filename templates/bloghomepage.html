@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>blog!</h1>
+
+<ul>
+    {% for p in blog_posts %}
+        <li>{{ p.title | escape }}</li>  <!-- autoescape elims. need for this? -->
+        <p>{{ p.entry | escape }}</p>
+    {% endfor %}
+</ul>
+
+{% endblock %}

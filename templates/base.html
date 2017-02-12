@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Build-a-blog</title>
+        <style type="text/css">
+            .error {
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- put page NAV here later ("hacker" extras) -->
+        <nav>
+            <a href="/blog">home</a>&nbsp;&nbsp; | &nbsp;&nbsp;<a href="/blog/newpost">new post</a>
+        </nav>
+
+        {% block content %}
+        {% endblock %}
+        
+        <!-- put blog-entries next/prev NAV here later ("hacker" extras) -->
+    </body>
+</html>
