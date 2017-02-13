@@ -46,8 +46,8 @@ temp_blogs_data = {
 class ViewBlogPostsHandler(Handler):
     def get(self):
         # num_existing_recs = BlogPost.all().count
-        # logging.info("num_existing_recs = " + str(num_existing_recs))
 
+        # controls adding dummy starter BlogPost entries/data
         db_was_empty = True
         query_iterator = db.GqlQuery("SELECT * FROM BlogPost" +
                                 " ORDER BY created DESC LIMIT 5").run()
@@ -60,7 +60,8 @@ class ViewBlogPostsHandler(Handler):
             title = cgi.escape(blog_item)
             blog_entry = cgi.escape(temp_blogs_data[blog_item])
             b = BlogPost(title = title, blog_entry = blog_entry)
-            all_blogs.append(b)
+            # all_blogs.append(b)
+            all_blogs.insert(0, b)
             if db_was_empty:
                b.put() 
                logging.info('Wrote another BlogPost entry to DB:' + str(b))
