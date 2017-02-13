@@ -36,15 +36,31 @@ class SlashHandler(Handler):
 
 class NewBlogPostHandler(Handler):
     def get(self):
+        error = ""
         logging.info("get() for NewBlogPost")
         t = jinja_env.get_template("new_post.html")
-        content = t.render()
+        error = self.request.get("error")
+        content = t.render(error = error)
         self.response.write(content)
 
     def post(self):
+        have_error = False
         logging.info("post() for NewBlogPost")
-        logging.info("TODO:  create new entity and put() to DB")
-        self.redirect("/blog")
+        logging.info("checking form contents for validity...")
+        title_str = self.request.get("title").lstrip().rstrip()
+        body_str = self.request.get("body").lstrip().rstrip()
+        if len(title_str) == 0 or len(body_str) == 0:
+            have_error = True
+
+        if have_error != True:
+            # TODO:  cgi.escape both title and body before inserting into DB
+            logging.info("TODO:  create new entity and put() to DB")
+            self.redirect("/blog")
+
+        else:
+            logging.info("title and/or entry bad")
+            error=cgi.escape('Need both title and body for new blog post.')
+            self.redirect("/blog/newpost?error=" + error)
         
 
 temp_blogs_data = { 
