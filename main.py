@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import webapp2
-import cgi
 import jinja2
+from google.appengine.ext import db
+
+import cgi
 import logging
 import os
-import time       # temp use, simply to ensure unique timestamps for dummy data
+import time
 
-from google.appengine.ext import db
 
 template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
@@ -17,7 +18,7 @@ class BlogPost(db.Model):
     title = db.StringProperty(required = True)
     blog_entry = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
-
+    permalink_id = db.StringProperty(required = False)
 
 class Handler(webapp2.RequestHandler):
     """ A base RequestHandler class for our app.  """
@@ -50,7 +51,9 @@ class ViewBlogPostsHandler(Handler):
 
         # controls adding dummy starter BlogPost entries/data
         db_was_empty = True
+
         all_blogs = []
+        # FIXME:  replace magic number in LIMIT clause
         query_iterator = db.GqlQuery("SELECT * FROM BlogPost" +
                                 " ORDER BY created DESC LIMIT 5").run()
         for blog_item in query_iterator:
@@ -64,9 +67,14 @@ class ViewBlogPostsHandler(Handler):
                 blog_entry = cgi.escape(temp_blogs_data[blog_item])
                 b = BlogPost(title = title, blog_entry = blog_entry)
                 all_blogs.insert(0, b)  # FIXME:  zero index SHOULD've worked
-                b.put() 
+                key = b.put() 
                 logging.info('Wrote another BlogPost entry to DB:' + 
-                                '  title = ' + b.title + str(b))
+                                '  title = ' + b.title + str(b) +
+                                '  id = ' + str(key.id()))
+                                # '  key = ' + str(key))
+                time.sleep(1) # to ensure record's stable before grabbing id
+                b.permalink_id = str(key.id())
+                b.put()
                 time.sleep(1) # to ensure unique timestamps for blog entries
         
         t = jinja_env.get_template("bloghomepage.html")

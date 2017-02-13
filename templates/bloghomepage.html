@@ -5,7 +5,8 @@
 <h1>blog!</h1>
 
     {% for p in blog_posts %}
-        <h2>{{ p.title | escape }}</h2>  <!-- autoescape elims. need for this? -->
+        <!-- autoescape elims. need for this? -->
+        <h2><a href="/blog/{{ p.permalink_id }}">{{ p.title | escape }}</a></h2>
         <p>{{ p.blog_entry | escape }}</p>
     {% endfor %}
 
