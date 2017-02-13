@@ -36,9 +36,16 @@ class SlashHandler(Handler):
 
 class NewBlogPostHandler(Handler):
     def get(self):
-        # t = jinja_env.get_template("
-        self.response.write("get() for new blog post")
+        logging.info("get() for NewBlogPost")
+        t = jinja_env.get_template("new_post.html")
+        content = t.render()
+        self.response.write(content)
 
+    def post(self):
+        logging.info("post() for NewBlogPost")
+        logging.info("TODO:  create new entity and put() to DB")
+        self.redirect("/blog")
+        
 
 temp_blogs_data = { 
     'Blogs r Us': 'It was the best of times; it was the',
@@ -80,6 +87,10 @@ class ViewAllBlogPostsHandler(Handler):
         t = jinja_env.get_template("bloghomepage.html")
         content = t.render(blog_posts = all_blogs)
         self.response.write(content)
+
+    def post(self):
+        logging.info("post() for/on main blog page")
+        pass
         
 
 class ViewSingleBlogPostHandler(Handler):

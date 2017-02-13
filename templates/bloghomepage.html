@@ -2,6 +2,17 @@
 
 {% block content %}
 
+<!--
+<style type="text/css">
+            textarea.new_blog_post_body {
+                width: 400px;
+                height: 200px;
+                font-size: 17px;
+                font-family: monospace;
+            }
+</style>
+-->
+
 <h1>blog!</h1>
 
     {% for p in blog_posts %}
@@ -9,5 +20,25 @@
         <h2><a href="/blog/{{ p.permalink_id }}">{{ p.title | escape }}</a></h2>
         <p>{{ p.blog_entry | escape }}</p>
     {% endfor %}
+
+    <!-- TODO:  temp anchor to allow jumping to new post section of
+                SINGLE-page initial draft                            -->
+    <!-- 
+    <br>
+    <h1>new post</h1>
+
+    <a name="new_post_frag"><form method="post">
+        <label>
+            <div>title</div>
+            <input type="text" name="title" value="" autofocus>
+        </label>
+        <label>
+            <div>post</div>
+            <textarea class="new_blog_post_body" name="body"></textarea>
+        </label>
+        <div class="error">{{ error }}</div>
+        <input type="submit">
+    </form></a>
+    -->
 
 {% endblock %}
