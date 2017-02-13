@@ -20,9 +20,9 @@ class BlogPost(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
     permalink_id = db.StringProperty(required = False)
 
+
 class Handler(webapp2.RequestHandler):
     """ A base RequestHandler class for our app.  """
-
     def renderError(self, error_code):
         """ Sends an HTTP error code + generic 'oops!' message to the client."""
         self.error(error_code)
@@ -45,7 +45,7 @@ temp_blogs_data = {
     'Second Blog Post': 'I hear the third time\'s the charm'
 }
 
-class ViewBlogPostsHandler(Handler):
+class ViewAllBlogPostsHandler(Handler):
     def get(self):
         # num_existing_recs = BlogPost.all().count
 
@@ -82,10 +82,14 @@ class ViewBlogPostsHandler(Handler):
         self.response.write(content)
         
 
-        
+class ViewSingleBlogPostHandler(Handler):
+    def get(self, id):
+        self.response.write("HERE, we would view blog post w/ID = " + id)
+
 
 app = webapp2.WSGIApplication([
     ('/', SlashHandler),
-    ('/blog', ViewBlogPostsHandler),
-    ('/blog/newpost', NewBlogPostHandler)
+    ('/blog', ViewAllBlogPostsHandler),
+    ('/blog/newpost', NewBlogPostHandler),
+    webapp2.Route('/blog/<id:\d+>', ViewSingleBlogPostHandler)
 ], debug=True)
