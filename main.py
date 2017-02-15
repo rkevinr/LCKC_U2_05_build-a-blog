@@ -29,7 +29,7 @@ class Handler(webapp2.RequestHandler):
         self.response.write("Oops! Something went wrong.")
 
 
-class SlashHandler(Handler):
+class IndexHandler(Handler):
     def get(self):
         self.redirect('/blog')
 
@@ -47,8 +47,7 @@ class NewBlogPostHandler(Handler):
         logging.info("post() for NewBlogPost")
         title_str = self.request.get("title").lstrip().rstrip()
         body_str = self.request.get("body").lstrip().rstrip()
-        # logging.info("    title, body = " + title_str + ", " + body_str)
-        # logging.info("checking form contents for validity...")
+        
         if len(title_str) == 0 or len(body_str) == 0:
             have_error = True
 
@@ -58,12 +57,13 @@ class NewBlogPostHandler(Handler):
             blog_entry = cgi.escape(body_str)
             b = BlogPost(title = title, blog_entry = blog_entry)
             key = b.put()
-            logging.info('Wrote new BlogPost entry to DB:' +
-                            '  title = ' + b.title + str(b) +
-                            '  id = ' + str(key.id()))
             time.sleep(1) # to ensure record's stable before grabbing id
-            b.permalink_id = str(key.id())
+            b.permalink_id = str(key.id())  # FIXME: is "b." OK on RHS?
             b.put()
+            logging.info('Wrote new BlogPost entry to DB:' +
+                            '  title = ' + b.title + 
+                            ', permalink = ' + str(b.permalink_id))
+                            # '  id = ' + str(key.id()) +
             self.redirect("/blog")
 
         else:
@@ -71,8 +71,7 @@ class NewBlogPostHandler(Handler):
             error=cgi.escape('Need both title and body for new blog post.')
             escaped_title = cgi.escape(title_str)
             escaped_body = cgi.escape(body_str)
-            self.redirect("/blog/newpost", error, 
-                                escaped_title, escaped_body)
+            self.redirect("/blog/newpost", error, escaped_title, escaped_body)
         
 
 temp_blogs_data = { 
@@ -83,19 +82,24 @@ temp_blogs_data = {
 class ViewAllBlogPostsHandler(Handler):
     def get(self):
         # num_existing_recs = BlogPost.all().count
-
+        
         # controls adding dummy starter BlogPost entries/data
-        db_was_empty = True
-
+        # db_was_empty = True
+        
         all_blogs = []
+        
         # FIXME:  replace magic number in LIMIT clause
         query_iterator = db.GqlQuery("SELECT * FROM BlogPost" +
                                 " ORDER BY created DESC LIMIT 5").run()
         for blog_item in query_iterator:
             db_was_empty = False
-            logging.info("query_result: " + str(blog_item))
-            all_blogs.insert(0, blog_item)
+            # ", permalink = " + str(blog_item.permalink_id) +
+            logging.info("item created: " + str(blog_item.created) +
+                            ", title = " + str(blog_item.title))
+            # all_blogs.insert(0, blog_item)
+            all_blogs.append(blog_item)
 
+        '''
         if db_was_empty:
             for blog_item in temp_blogs_data:
                 title = cgi.escape(blog_item)
@@ -111,6 +115,7 @@ class ViewAllBlogPostsHandler(Handler):
                 b.permalink_id = str(key.id())
                 b.put()
                 time.sleep(1) # to ensure unique timestamps for blog entries
+        '''
         
         t = jinja_env.get_template("bloghomepage.html")
         content = t.render(blog_posts = all_blogs)
@@ -127,7 +132,7 @@ class ViewSingleBlogPostHandler(Handler):
 
 
 app = webapp2.WSGIApplication([
-    ('/', SlashHandler),
+    ('/', IndexHandler),
     ('/blog', ViewAllBlogPostsHandler),
     ('/blog/newpost', NewBlogPostHandler),
     webapp2.Route('/blog/<id:\d+>', ViewSingleBlogPostHandler)
