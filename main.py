@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import webapp2
 import jinja2
@@ -15,6 +16,7 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 
 
 class BlogPost(db.Model):
+    # FIXME:  need to set/handle char encoding; Sp. 'í' was enough to break it
     title = db.StringProperty(required = True)
     blog_entry = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
@@ -95,7 +97,7 @@ class ViewAllBlogPostsHandler(Handler):
             db_was_empty = False
             # ", permalink = " + str(blog_item.permalink_id) +
             logging.info("item created: " + str(blog_item.created) +
-                            ", title = " + str(blog_item.title))
+                            ", title = " + unicode(blog_item.title))
             # all_blogs.insert(0, blog_item)
             all_blogs.append(blog_item)
 
