@@ -13,15 +13,16 @@
 
 
     <h1>new post</h1>
-
     <form method="post">
         <label>
             <div>title</div>
-            <input type="text" name="title" value="" autofocus>
+            <input type="text" name="title" value="{{ title }}" autofocus>
         </label>
         <label>
             <div>post</div>
-            <textarea class="new_blog_post_body" name="body"></textarea>
+            <textarea class="new_blog_post_body" name="body">
+                {{ body }}
+            </textarea>
         </label>
         <div><span class="error">{{ error }}</span></div>
         <input type="submit">

@@ -35,32 +35,44 @@ class SlashHandler(Handler):
 
 
 class NewBlogPostHandler(Handler):
-    def get(self):
-        error = ""
-        logging.info("get() for NewBlogPost")
+    def get(self, error="", title="", body=""):
+        logging.info("get() for NewBlogPost...")
         t = jinja_env.get_template("new_post.html")
         error = self.request.get("error")
-        content = t.render(error = error)
+        content = t.render(error = error, title = title, body = body)
         self.response.write(content)
 
     def post(self):
         have_error = False
         logging.info("post() for NewBlogPost")
-        logging.info("checking form contents for validity...")
         title_str = self.request.get("title").lstrip().rstrip()
         body_str = self.request.get("body").lstrip().rstrip()
+        # logging.info("    title, body = " + title_str + ", " + body_str)
+        # logging.info("checking form contents for validity...")
         if len(title_str) == 0 or len(body_str) == 0:
             have_error = True
 
         if have_error != True:
-            # TODO:  cgi.escape both title and body before inserting into DB
             logging.info("TODO:  create new entity and put() to DB")
+            title = cgi.escape(title_str)
+            blog_entry = cgi.escape(body_str)
+            b = BlogPost(title = title, blog_entry = blog_entry)
+            key = b.put()
+            logging.info('Wrote new BlogPost entry to DB:' +
+                            '  title = ' + b.title + str(b) +
+                            '  id = ' + str(key.id()))
+            time.sleep(1) # to ensure record's stable before grabbing id
+            b.permalink_id = str(key.id())
+            b.put()
             self.redirect("/blog")
 
         else:
             logging.info("title and/or entry bad")
             error=cgi.escape('Need both title and body for new blog post.')
-            self.redirect("/blog/newpost?error=" + error)
+            escaped_title = cgi.escape(title_str)
+            escaped_body = cgi.escape(body_str)
+            self.redirect("/blog/newpost", error, 
+                                escaped_title, escaped_body)
         
 
 temp_blogs_data = { 
