@@ -16,7 +16,6 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 
 
 class BlogPost(db.Model):
-    # FIXME:  need to set/handle char encoding; Sp. 'í' was enough to break it
     title = db.StringProperty(required = True)
     blog_entry = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
@@ -83,20 +82,14 @@ temp_blogs_data = {
 
 class ViewAllBlogPostsHandler(Handler):
     def get(self):
-        # num_existing_recs = BlogPost.all().count
-        
-        # controls adding dummy starter BlogPost entries/data
-        # db_was_empty = True
-        
         all_blogs = []
+        MAX_BLOG_ENTRIES_PER_PAGE = str(5)
         
-        # FIXME:  replace magic number in LIMIT clause
         query_iterator = db.GqlQuery("SELECT * FROM BlogPost" +
-                                " ORDER BY created DESC LIMIT 5").run()
+                                " ORDER BY created DESC LIMIT " +
+                                MAX_BLOG_ENTRIES_PER_PAGE).run()
+        
         for blog_item in query_iterator:
-            db_was_empty = False
-            # logging.info("item created: " + str(blog_item.created) +
-            #                 ", title = " + unicode(blog_item.title))
             all_blogs.append(blog_item)
 
         t = jinja_env.get_template("bloghomepage.html")
