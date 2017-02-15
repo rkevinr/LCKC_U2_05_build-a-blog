@@ -95,30 +95,10 @@ class ViewAllBlogPostsHandler(Handler):
                                 " ORDER BY created DESC LIMIT 5").run()
         for blog_item in query_iterator:
             db_was_empty = False
-            # ", permalink = " + str(blog_item.permalink_id) +
-            logging.info("item created: " + str(blog_item.created) +
-                            ", title = " + unicode(blog_item.title))
-            # all_blogs.insert(0, blog_item)
+            # logging.info("item created: " + str(blog_item.created) +
+            #                 ", title = " + unicode(blog_item.title))
             all_blogs.append(blog_item)
 
-        '''
-        if db_was_empty:
-            for blog_item in temp_blogs_data:
-                title = cgi.escape(blog_item)
-                blog_entry = cgi.escape(temp_blogs_data[blog_item])
-                b = BlogPost(title = title, blog_entry = blog_entry)
-                all_blogs.insert(0, b)  # FIXME:  zero index SHOULD've worked
-                key = b.put() 
-                logging.info('Wrote another BlogPost entry to DB:' + 
-                                '  title = ' + b.title + str(b) +
-                                '  id = ' + str(key.id()))
-                                # '  key = ' + str(key))
-                time.sleep(1) # to ensure record's stable before grabbing id
-                b.permalink_id = str(key.id())
-                b.put()
-                time.sleep(1) # to ensure unique timestamps for blog entries
-        '''
-        
         t = jinja_env.get_template("bloghomepage.html")
         content = t.render(blog_posts = all_blogs)
         self.response.write(content)
