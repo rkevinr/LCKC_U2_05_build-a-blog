@@ -3,18 +3,19 @@
 {% block content %}
 
     <style type="text/css">
-                textarea.new_blog_post_body {
+                p.new_blog_post_body {
                     width: 400px;
                     height: 200px;
                     font-size: 1.5em;
                     font-family: monospace;
+                    text-align: left;
                 }
     </style>
 
 
     <h1>{{ title }}</h1>
-    <textarea class="new_blog_post_body" readonly>
+    <p class="new_blog_post_body">
         {{ body }}
-    </textarea>
+    </p>
 
 {% endblock %}

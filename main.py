@@ -66,11 +66,7 @@ class NewBlogPostHandler(Handler):
             time.sleep(1) # to ensure record's stable before grabbing id
             b.permalink_id = str(key.id())
             b.put()
-            logging.info('Wrote new BlogPost entry to DB:' +
-                            '  title = ' + b.title + 
-                            ', permalink = ' + str(b.permalink_id))
-                            # '  id = ' + str(key.id()) +
-            self.redirect("/blog")
+            self.redirect("/blog/" + b.permalink_id)
 
         else:
             logging.info("title and/or entry bad")
@@ -102,10 +98,6 @@ class ViewAllBlogPostsHandler(Handler):
         content = t.render(blog_posts = all_blogs)
         self.response.write(content)
 
-    def post(self):
-        logging.info("post() for/on main blog page")
-        pass
-        
 
 class ViewSingleBlogPostHandler(Handler):
     def render_page(self, title="", body=""):
@@ -113,15 +105,15 @@ class ViewSingleBlogPostHandler(Handler):
         content = t.render(title=title, body=body)
         self.response.write(content)
         
-
     def get(self, id=""):
         blog_item = BlogPost.get_by_id(int(id))
-        logging.info("HERE, we view a single blog post... with id =" + str(id))
-        title=blog_item.title
-        body=blog_item.blog_entry
-        logging.info("title = " + title + ", body = " + body)
 
-        self.render_page(title=title, body=body)
+        if blog_item:
+            title=blog_item.title
+            body=blog_item.blog_entry
+            self.render_page(title=title, body=body)
+        else:
+            self.redirect("/blog")  # FIXME:  should post ERROR if id is bogus
 
 
 app = webapp2.WSGIApplication([
