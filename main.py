@@ -83,6 +83,11 @@ temp_blogs_data = {
 }
 
 class ViewAllBlogPostsHandler(Handler):
+    # FIXME: add (in context) "Next/Prev" nav at bottom, and tie 
+    # FIXME:   currently-displayed "n" recs to an offset
+    # TODO: query the database for posts, and return them
+    # def get_posts(limit, offset):
+    
     def get(self):
         all_blogs = []
         MAX_BLOG_ENTRIES_PER_PAGE = str(5)
@@ -100,9 +105,9 @@ class ViewAllBlogPostsHandler(Handler):
 
 
 class ViewSingleBlogPostHandler(Handler):
-    def render_page(self, title="", body=""):
+    def render_page(self, title="", body="", error=""):
         t = jinja_env.get_template("display_indiv_post.html")
-        content = t.render(title=title, body=body)
+        content = t.render(title=title, body=body, error=error)
         self.response.write(content)
         
     def get(self, id=""):
@@ -113,7 +118,12 @@ class ViewSingleBlogPostHandler(Handler):
             body=blog_item.blog_entry
             self.render_page(title=title, body=body)
         else:
-            self.redirect("/blog")  # FIXME:  should post ERROR if id is bogus
+            title = "Invalid permalink"
+            body = ""
+            error = "Invalid permalink.  Please see main blog posts page."
+            self.render_page(title=title, body=body, error=error)
+            # invalid_permalink.html
+            # self.redirect("/blog")  # FIXME:  MUST post ERROR if id is bogus
 
 
 app = webapp2.WSGIApplication([
