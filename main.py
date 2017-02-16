@@ -36,11 +36,17 @@ class IndexHandler(Handler):
 
 
 class NewBlogPostHandler(Handler):
+    def render_page(self, error="", title="", body=""):
+        logging.info("render_page() for NewBlogPost...")
+        t = jinja_env.get_template("new_post.html")
+        content = t.render(error=error, title=title, body=body)
+        self.response.write(content)
+
     def get(self, error="", title="", body=""):
         logging.info("get() for NewBlogPost...")
         t = jinja_env.get_template("new_post.html")
         error = self.request.get("error")
-        content = t.render(error = error, title = title, body = body)
+        content = t.render(error=error, title=title, body=body)
         self.response.write(content)
 
     def post(self):
@@ -53,13 +59,12 @@ class NewBlogPostHandler(Handler):
             have_error = True
 
         if have_error != True:
-            logging.info("TODO:  create new entity and put() to DB")
             title = cgi.escape(title_str)
             blog_entry = cgi.escape(body_str)
             b = BlogPost(title = title, blog_entry = blog_entry)
             key = b.put()
             time.sleep(1) # to ensure record's stable before grabbing id
-            b.permalink_id = str(key.id())  # FIXME: is "b." OK on RHS?
+            b.permalink_id = str(key.id())
             b.put()
             logging.info('Wrote new BlogPost entry to DB:' +
                             '  title = ' + b.title + 
@@ -72,7 +77,8 @@ class NewBlogPostHandler(Handler):
             error=cgi.escape('Need both title and body for new blog post.')
             escaped_title = cgi.escape(title_str)
             escaped_body = cgi.escape(body_str)
-            self.redirect("/blog/newpost", error, escaped_title, escaped_body)
+            self.render_page(error=error, title=escaped_title,
+                                body=escaped_body)
         
 
 temp_blogs_data = { 
