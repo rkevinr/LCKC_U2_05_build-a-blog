@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <style type="text/css">
+                textarea.new_blog_post_body {
+                    width: 400px;
+                    height: 200px;
+                    font-size: 1.5em;
+                    font-family: monospace;
+                }
+    </style>
+
+
+    <h1>{{ title }}</h1>
+    <textarea class="new_blog_post_body" readonly>
+        {{ body }}
+    </textarea>
+
+{% endblock %}

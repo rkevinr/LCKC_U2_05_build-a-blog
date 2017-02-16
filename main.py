@@ -108,8 +108,20 @@ class ViewAllBlogPostsHandler(Handler):
         
 
 class ViewSingleBlogPostHandler(Handler):
-    def get(self, id):
-        self.response.write("HERE, we would view blog post w/ID = " + id)
+    def render_page(self, title="", body=""):
+        t = jinja_env.get_template("display_indiv_post.html")
+        content = t.render(title=title, body=body)
+        self.response.write(content)
+        
+
+    def get(self, id=""):
+        blog_item = BlogPost.get_by_id(int(id))
+        logging.info("HERE, we view a single blog post... with id =" + str(id))
+        title=blog_item.title
+        body=blog_item.blog_entry
+        logging.info("title = " + title + ", body = " + body)
+
+        self.render_page(title=title, body=body)
 
 
 app = webapp2.WSGIApplication([
